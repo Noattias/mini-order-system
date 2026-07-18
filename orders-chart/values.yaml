@@ -1,0 +1,11 @@
+replicaCount: 1
+
+image:
+  repository: orders-backend
+  tag: v1
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 8000
+  targetPort: 8000
