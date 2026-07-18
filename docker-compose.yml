@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: orders-postgres
+    environment:
+      POSTGRES_USER: ordersuser
+      POSTGRES_PASSWORD: orderspass
+      POSTGRES_DB: ordersdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: orders-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mongodb:
+    image: mongo:latest
+    container_name: orders-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+    container_name: orders-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  worker:
+    build:
+      context: ./worker
+    container_name: orders-worker
+    depends_on:
+      - rabbitmq
+      - mongodb
+
+volumes:
+  postgres_data:
+  mongo_data:

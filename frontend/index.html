@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mini Order System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            width: 420px;
+
+            padding: 35px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #555;
+        }
+
+        button {
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #222;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #444;
+            transform: translateY(-1px);
+        }
+
+        .response-box {
+            margin-top: 25px;
+
+            padding: 15px;
+
+            background: #f7f7f7;
+
+            border-radius: 8px;
+
+            min-height: 50px;
+
+            font-size: 13px;
+
+            white-space: pre-wrap;
+        }
+
+        .success {
+            border-left: 4px solid #28a745;
+        }
+
+        .error {
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>🍔 Mini Order System</h1>
+
+    <div class="subtitle">
+        Create a new order
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Customer Name
+        </label>
+
+        <input
+            id="customer"
+            type="text"
+            placeholder="Enter customer name"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Item
+        </label>
+
+        <select id="item">
+
+            <option value="Burger">
+                🍔 Burger
+            </option>
+
+            <option value="Pizza">
+                🍕 Pizza
+            </option>
+
+            <option value="Pasta">
+                🍝 Pasta
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Quantity
+        </label>
+
+        <input
+            id="quantity"
+            type="number"
+            value="1"
+            min="1"
+        >
+
+    </div>
+
+
+    <button onclick="createOrder()">
+        Create Order
+    </button>
+
+
+    <div
+        id="response"
+        class="response-box"
+    >
+        Waiting for an order...
+    </div>
+
+</div>
+
+
+<script>
+
+async function createOrder() {
+
+    const customer =
+        document.getElementById("customer").value;
+
+    const item =
+        document.getElementById("item").value;
+
+    const quantity =
+        Number(
+            document.getElementById("quantity").value
+        );
+
+
+    const order = {
+
+        customer: customer,
+
+        item: item,
+
+        quantity: quantity
+
+    };
+
+
+    const responseBox =
+        document.getElementById("response");
+
+
+    responseBox.textContent =
+        "Creating order...";
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                "http://localhost:8000/api/orders",
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(order)
+
+                }
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (response.ok) {
+
+            responseBox.className =
+                "response-box success";
+
+            responseBox.textContent =
+                "✓ Order created successfully!\n\n" +
+                "Order ID: " +
+                data.order_id +
+                "\n" +
+                "Status: " +
+                data.status;
+
+        }
+
+        else {
+
+            responseBox.className =
+                "response-box error";
+
+            responseBox.textContent =
+                "Error creating order";
+
+        }
+
+    }
+
+    catch (error) {
+
+        responseBox.className =
+            "response-box error";
+
+        responseBox.textContent =
+            "Connection error:\n" +
+            error;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

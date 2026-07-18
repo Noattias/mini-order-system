@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-backend
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: orders-backend
+
+  template:
+    metadata:
+      labels:
+        app: orders-backend
+
+    spec:
+      containers:
+        - name: orders-backend
+          image: orders-backend:v1
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-backend-service
+
+spec:
+  selector:
+    app: orders-backend
+
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+
+  type: NodePort
